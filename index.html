@@ -1,0 +1,212 @@
+﻿<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lucky Six | 로또 추천</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header class="site-header">
+        <nav class="nav">
+            <a class="brand" href="#">
+                <span class="brand-mark">L</span>
+                <span>Lucky Six</span>
+            </a>
+            <div class="nav-links">
+                <a class="active" href="#">로또 추천</a>
+                <a href="#">번호 분석</a>
+                <a href="#">회차 정보</a>
+                <a href="#">당첨 후기</a>
+            </div>
+            <button class="login" id="googleLoginBtn" type="button">구글 로그인</button>
+            <span class="login-status" id="loginStatus" aria-live="polite"></span>
+        </nav>
+    </header>
+
+    <main class="main">
+        <section class="hero">
+            <section class="hero-copy">
+                <div class="section-label">Today’s Recommendation</div>
+                <h1>당신의 <span>행운 번호</span><br>추천</h1>
+                <p class="subline">
+                    새로운 조합을 매일 생성하고, 번호 패턴을 한눈에 확인하며 오늘의 로또 행운을 준비해보세요.
+                </p>
+                <div class="hero-actions">
+                    <button class="btn btn-primary" id="recommendBtn">🎯 번호 추천받기</button>
+                    <button class="btn btn-secondary">분석 보기</button>
+                </div>
+                <div class="hero-meta">
+                    <span>다음 회차</span>
+                    <span class="divider">|</span>
+                    <span>1047회</span>
+                    <span class="divider">|</span>
+                    <span>2026년 09월 11일</span>
+                </div>
+            </section>
+
+            <aside class="hero-panel">
+                <div class="panel-head">
+                    <span class="title">이번 주 추첨</span>
+                    <span class="chip">LIVE</span>
+                </div>
+                <div class="jackpot">
+                    <div class="label">총 상금</div>
+                    <div class="amount">₩ 11.2억</div>
+                </div>
+                <div class="panel-grid">
+                    <div class="grid-card">
+                        <div class="mini-label">추천 번호</div>
+                        <div class="mini-value" id="todayCount">06</div>
+                    </div>
+                    <div class="grid-card">
+                        <div class="mini-label">추천 방식</div>
+                        <div class="mini-value">랜덤</div>
+                    </div>
+                    <div class="grid-card">
+                        <div class="mini-label">당첨 등수</div>
+                        <div class="mini-value">1~5</div>
+                    </div>
+                    <div class="grid-card">
+                        <div class="mini-label">회차</div>
+                        <div class="mini-value">1047</div>
+                    </div>
+                </div>
+            </aside>
+        </section>
+
+        <section class="recommend-section">
+            <div class="section-top">
+                <div class="section-title"><span>추천 조합</span> 5개</div>
+                <div class="actions">
+                    <button class="small-btn" id="shuffleBtn">새 조합 생성</button>
+                </div>
+            </div>
+
+            <section class="results-grid" id="results"></section>
+
+            <div class="notice">
+                ⚠️ 추천 번호는 무작위 알고리즘으로 생성된 예시 정보이며, 당첨을 보장하지 않습니다.
+            </div>
+        </section>
+
+        <section class="stats-strip">
+            <article class="stat-card">
+                <span class="stat-icon">✦</span>
+                <div class="stat-body">
+                    <span class="label">오늘의 추천</span>
+                    <span class="value">5게임</span>
+                </div>
+            </article>
+            <article class="stat-card">
+                <span class="stat-icon">☄</span>
+                <div class="stat-body">
+                    <span class="label">분석 포인트</span>
+                    <span class="value">12</span>
+                </div>
+            </article>
+            <article class="stat-card">
+                <span class="stat-icon">☍</span>
+                <div class="stat-body">
+                    <span class="label">행운 확률</span>
+                    <span class="value">+23%</span>
+                </div>
+            </article>
+        </section>
+
+        <section class="dashboard-section">
+            <article class="dashboard-card analysis-card">
+                <div class="dash-head">
+                    <div class="dash-title"><span>번호 분석</span></div>
+                    <span class="dash-tag">패턴 보기</span>
+                </div>
+                <div class="chart" id="analysisChart">
+                    <div class="chart-row">
+                        <span class="chart-label">01~10</span>
+                        <span class="chart-track"><span class="chart-bar" style="width:74%"></span></span>
+                        <span class="chart-count">12</span>
+                    </div>
+                    <div class="chart-row">
+                        <span class="chart-label">11~20</span>
+                        <span class="chart-track"><span class="chart-bar" style="width:43%"></span></span>
+                        <span class="chart-count">8</span>
+                    </div>
+                    <div class="chart-row">
+                        <span class="chart-label">21~30</span>
+                        <span class="chart-track"><span class="chart-bar" style="width:66%"></span></span>
+                        <span class="chart-count">11</span>
+                    </div>
+                    <div class="chart-row">
+                        <span class="chart-label">31~40</span>
+                        <span class="chart-track"><span class="chart-bar" style="width:58%"></span></span>
+                        <span class="chart-count">10</span>
+                    </div>
+                    <div class="chart-row">
+                        <span class="chart-label">41~45</span>
+                        <span class="chart-track"><span class="chart-bar" style="width:21%"></span></span>
+                        <span class="chart-count">4</span>
+                    </div>
+                </div>
+            </article>
+
+            <article class="dashboard-card latest-card">
+                <div class="dash-head">
+                    <div class="dash-title"><span>최근 추첨 결과</span></div>
+                    <span class="dash-tag">1047회</span>
+                </div>
+                <div class="latest-date">2026년 09월 11일</div>
+                <div class="latest-numbers">
+                    <span class="ball yellow">05</span>
+                    <span class="ball blue">15</span>
+                    <span class="ball red">24</span>
+                    <span class="ball gray">31</span>
+                    <span class="ball green">39</span>
+                    <span class="ball yellow">42</span>
+                    <span class="plus">+</span>
+                    <span class="ball red">07</span>
+                </div>
+                <div class="latest-summary">
+                    <span class="summary-row"><strong>1등</strong> 18명</span>
+                    <span class="summary-row"><strong>당첨금</strong> 8,624,370원</span>
+                </div>
+            </article>
+        </section>
+
+        <section class="history-section">
+            <div class="section-top">
+                <div class="section-title"><span>회차 정보</span></div>
+                <div class="actions">
+                    <button class="small-btn">전체 보기</button>
+                </div>
+            </div>
+            <div class="history-list" id="historyRows">
+                <div class="history-row">
+                    <span class="history-round">1047회</span>
+                    <span class="history-date">2026.09.11</span>
+                    <span class="history-numbers">05 15 24 31 39 42 + 07</span>
+                    <span class="history-prize">1등 18명</span>
+                </div>
+                <div class="history-row">
+                    <span class="history-round">1046회</span>
+                    <span class="history-date">2026.09.08</span>
+                    <span class="history-numbers">02 11 19 27 34 37 + 12</span>
+                    <span class="history-prize">1등 24명</span>
+                </div>
+                <div class="history-row">
+                    <span class="history-round">1045회</span>
+                    <span class="history-date">2026.09.04</span>
+                    <span class="history-numbers">03 10 16 22 33 44 + 38</span>
+                    <span class="history-prize">1등 12명</span>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        © 2026 Lucky Six. All rights reserved.
+    </footer>
+
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script src="main.js"></script>
+</body>
+</html>
