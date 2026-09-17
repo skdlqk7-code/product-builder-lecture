@@ -1,10 +1,18 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Lucky Six | 로또 추천</title>
     <link rel="stylesheet" href="style.css">
+    <script>
+        (function() {
+            const savedTheme = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const theme = savedTheme || (prefersDark ? 'dark' : 'light');
+            document.documentElement.setAttribute('data-theme', theme);
+        })();
+    </script>
 </head>
 <body>
     <header class="site-header">
@@ -19,8 +27,14 @@
                 <a href="#">회차 정보</a>
                 <a href="#">당첨 후기</a>
             </div>
-            <button class="login" id="googleLoginBtn" type="button">구글 로그인</button>
-            <span class="login-status" id="loginStatus" aria-live="polite"></span>
+            <div class="nav-actions">
+                <button class="theme-toggle" id="themeToggle" type="button" aria-label="테마 전환" title="테마 전환">
+                    <span class="theme-icon">🌙</span>
+                    <span class="theme-label" id="themeLabel">다크모드</span>
+                </button>
+                <button class="login" id="googleLoginBtn" type="button">구글 로그인</button>
+                <span class="login-status" id="loginStatus" aria-live="polite"></span>
+            </div>
         </nav>
     </header>
 

@@ -237,6 +237,50 @@ if (shuffleButton) {
     shuffleButton.addEventListener("click", recommendLotto);
 }
 
+function initTheme() {
+    const themeToggle = document.getElementById("themeToggle");
+    const themeLabel = document.getElementById("themeLabel");
+    const themeIcon = themeToggle ? themeToggle.querySelector(".theme-icon") : null;
+
+    function applyTheme(theme) {
+        document.documentElement.setAttribute("data-theme", theme);
+        localStorage.setItem("theme", theme);
+
+        const isDark = theme === "dark";
+        if (themeLabel) {
+            themeLabel.textContent = isDark ? "라이트모드" : "다크모드";
+        }
+        if (themeIcon) {
+            themeIcon.textContent = isDark ? "☀️" : "🌙";
+        }
+        if (themeToggle) {
+            const label = isDark ? "라이트모드로 전환" : "다크모드로 전환";
+            themeToggle.setAttribute("aria-label", label);
+            themeToggle.setAttribute("title", label);
+        }
+    }
+
+    const currentTheme = document.documentElement.getAttribute("data-theme") || "light";
+    applyTheme(currentTheme);
+
+    if (themeToggle) {
+        themeToggle.addEventListener("click", () => {
+            const current = document.documentElement.getAttribute("data-theme") || "light";
+            const next = current === "dark" ? "light" : "dark";
+            applyTheme(next);
+        });
+    }
+
+    if (window.matchMedia) {
+        window.matchMedia("(prefers-color-scheme: dark)").addEventListener("change", (e) => {
+            if (!localStorage.getItem("theme")) {
+                applyTheme(e.matches ? "dark" : "light");
+            }
+        });
+    }
+}
+
+initTheme();
 initGoogleLogin();
 
 renderAnalysisChart();

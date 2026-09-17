@@ -12,6 +12,32 @@
             --green: #3ca66a;
             --blue: #4e8dff;
             --shadow: rgba(37, 33, 28, 0.12);
+            --card-bg: linear-gradient(180deg, #ffffff, #fffaf6);
+            --header-bg: rgba(25, 35, 40, 0.92);
+            --footer-bg: #192328;
+            --bg-radial-1: rgba(247,183,49,0.08);
+            --bg-radial-2: rgba(217,59,59,0.08);
+        }
+
+        [data-theme="dark"] {
+            --bg: #0d1318;
+            --paper: #161f26;
+            --text: #f0f4f8;
+            --muted: #96a5b2;
+            --subtle: #6b7a86;
+            --line: #24323c;
+            --red: #ff5757;
+            --red-dark: #e03838;
+            --red-soft: rgba(255, 87, 87, 0.15);
+            --gold: #f7b731;
+            --green: #3ecc7e;
+            --blue: #5496ff;
+            --shadow: rgba(0, 0, 0, 0.45);
+            --card-bg: linear-gradient(180deg, #1b262f, #141c22);
+            --header-bg: rgba(13, 19, 24, 0.95);
+            --footer-bg: #090e12;
+            --bg-radial-1: rgba(247,183,49,0.04);
+            --bg-radial-2: rgba(255,87,87,0.05);
         }
 
         * {
@@ -24,10 +50,11 @@
             font-family: "Noto Sans KR", "Apple SD Gothic Neo", Arial, sans-serif;
             color: var(--text);
             background:
-                radial-gradient(circle at 70% 10%, rgba(247,183,49,0.08), transparent 15%),
-                radial-gradient(circle at 20% 80%, rgba(217,59,59,0.08), transparent 16%),
+                radial-gradient(circle at 70% 10%, var(--bg-radial-1), transparent 15%),
+                radial-gradient(circle at 20% 80%, var(--bg-radial-2), transparent 16%),
                 var(--bg);
             line-height: 1.6;
+            transition: background 0.3s ease, color 0.3s ease;
         }
 
         a {
@@ -38,10 +65,11 @@
         .site-header {
             position: sticky;
             top: 0;
-            background: rgba(25, 35, 40, 0.92);
+            background: var(--header-bg);
             backdrop-filter: blur(14px);
             border-bottom: 1px solid rgba(255, 255, 255, 0.08);
             z-index: 10;
+            transition: background 0.3s ease;
         }
 
         .nav {
@@ -114,6 +142,49 @@
             color: white;
         }
 
+        .nav-actions {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .theme-toggle {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            color: #ffffff;
+            border-radius: 999px;
+            padding: 8px 16px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+            backdrop-filter: blur(8px);
+        }
+
+        .theme-toggle:hover {
+            background: rgba(255, 255, 255, 0.22);
+            transform: translateY(-1px);
+        }
+
+        .theme-toggle:active {
+            transform: translateY(0);
+        }
+
+        .theme-icon {
+            font-size: 14px;
+            line-height: 1;
+        }
+
+        .theme-label {
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: -0.01em;
+        }
+
         .login {
             border: 1px solid rgba(255,255,255,0.8);
             background: transparent;
@@ -123,6 +194,7 @@
             font-size: 13px;
             font-weight: 800;
             cursor: pointer;
+            transition: all 0.2s ease;
         }
 
         .login:hover {
@@ -132,7 +204,7 @@
 
         .login-status {
             display: inline-block;
-            margin-left: 12px;
+            margin-left: 8px;
             font-size: 12px;
             font-weight: 700;
             min-height: 18px;
@@ -420,11 +492,12 @@
         }
 
         .lotto-card {
-            background: linear-gradient(180deg, #fff, #fffaf6);
+            background: var(--card-bg);
             border: 1px solid var(--line);
             border-radius: 20px;
             padding: 18px;
             box-shadow: 0 8px 24px var(--shadow);
+            transition: background 0.25s ease, border-color 0.25s ease;
         }
 
         .lotto-card .game-title {
@@ -540,11 +613,12 @@
 
         .site-footer {
             margin-top: 40px;
-            background: #192328;
+            background: var(--footer-bg);
             color: rgba(255,255,255,0.74);
             padding: 30px 24px;
             font-size: 12px;
             text-align: center;
+            transition: background 0.3s ease;
         }
 
         .dashboard-section {
@@ -732,6 +806,16 @@
             color: var(--muted);
         }
 
+        .hero-copy,
+        .recommend-section,
+        .dashboard-card,
+        .history-section,
+        .stat-card,
+        .small-btn,
+        .btn-secondary {
+            transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;
+        }
+
         @media (max-width: 960px) {
             .hero {
                 grid-template-columns: 1fr;
@@ -759,12 +843,27 @@
                 padding-bottom: 12px;
             }
 
+            .nav-actions {
+                gap: 8px;
+            }
+
+            .theme-toggle {
+                padding: 7px 12px;
+                font-size: 12px;
+            }
+
+            .login {
+                padding: 8px 16px;
+                font-size: 12px;
+            }
+
             .nav-links {
                 order: 3;
                 width: 100%;
                 justify-content: center;
                 gap: 14px;
                 flex-wrap: wrap;
+                margin-top: 6px;
             }
 
             .hero-copy {
