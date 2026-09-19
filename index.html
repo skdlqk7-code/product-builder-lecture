@@ -23,9 +23,9 @@
             </a>
             <div class="nav-links">
                 <a class="active" href="#">로또 추천</a>
-                <a href="#">번호 분석</a>
-                <a href="#">회차 정보</a>
-                <a href="#">당첨 후기</a>
+                <a href="#analysisChart">번호 분석</a>
+                <a href="#historyRows">회차 정보</a>
+                <a href="#contact">제휴 문의</a>
             </div>
             <div class="nav-actions">
                 <button class="theme-toggle" id="themeToggle" type="button" aria-label="테마 전환" title="테마 전환">
@@ -214,10 +214,85 @@
                 </div>
             </div>
         </section>
+
+        <section class="contact-section" id="contact">
+            <div class="section-top">
+                <div class="section-title"><span>제휴 문의</span> (Partnership)</div>
+                <div class="actions">
+                    <span class="chip">협력 & 제휴</span>
+                </div>
+            </div>
+            <p class="contact-intro">
+                Lucky Six와의 광고, 비즈니스 협력, 데이터 제휴 등 다양한 제안을 환영합니다.<br>
+                남겨주신 내용은 담당자 검토 후 기재해주신 이메일 또는 연락처로 신속히 답변드리겠습니다.
+            </p>
+
+            <form class="contact-form" id="partnershipForm" action="https://formspree.io/f/mbglleyp" method="POST">
+                <!-- Formspree 메일 제목 자동 설정 -->
+                <input type="hidden" name="_subject" value="[Lucky Six] 새로운 제휴 문의가 접수되었습니다">
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="contactName">회사명 / 담당자명 <span class="required">*</span></label>
+                        <input type="text" id="contactName" name="name" placeholder="예: (주)에이비씨 / 홍길동 팀장" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="contactEmail">회신받을 이메일 <span class="required">*</span></label>
+                        <input type="email" id="contactEmail" name="email" placeholder="partner@company.com" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="contactPhone">연락처 <span class="optional">(선택)</span></label>
+                        <input type="tel" id="contactPhone" name="phone" placeholder="010-1234-5678">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="contactType">제휴 유형 <span class="required">*</span></label>
+                        <select id="contactType" name="type" required>
+                            <option value="" disabled selected>제휴 유형을 선택해주세요</option>
+                            <option value="광고/마케팅 제휴">광고 / 마케팅 제휴</option>
+                            <option value="서비스/콘텐츠 연계">서비스 / 콘텐츠 제휴</option>
+                            <option value="데이터/비즈니스 협력">데이터 / 비즈니스 협력</option>
+                            <option value="기타 제휴 문의">기타 제휴 문의</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="contactSubject">문의 제목 <span class="required">*</span></label>
+                    <input type="text" id="contactSubject" name="subject" placeholder="제휴 제안 건의 핵심 제목을 입력해주세요" required>
+                </div>
+
+                <div class="form-group">
+                    <label for="contactMessage">제안 내용 <span class="required">*</span></label>
+                    <textarea id="contactMessage" name="message" rows="5" placeholder="회사/서비스 소개, 제안 배경 및 구체적인 협력 방안을 작성해주세요." required></textarea>
+                </div>
+
+                <div class="form-terms">
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="privacy_agreement" required>
+                        <span>[필수] 문의 처리를 위한 담당자 정보(이름, 연락처, 이메일) 수집 및 이용에 동의합니다.</span>
+                    </label>
+                </div>
+
+                <div class="form-submit-row">
+                    <button type="submit" class="btn btn-primary submit-btn" id="contactSubmitBtn">
+                        <span class="btn-text">📨 제휴 문의 보내기</span>
+                        <span class="btn-spinner" style="display: none;">⏳ 전송 중...</span>
+                    </button>
+                    <div class="form-status" id="formStatus" role="status" aria-live="polite"></div>
+                </div>
+            </form>
+        </section>
     </main>
 
     <footer class="site-footer">
-        © 2026 Lucky Six. All rights reserved.
+        <div class="footer-inner">
+            <span>© 2026 Lucky Six. All rights reserved.</span>
+            <span class="footer-divider">|</span>
+            <a href="#contact" class="footer-contact-link">제휴 문의 바로가기</a>
+        </div>
     </footer>
 
     <script src="https://accounts.google.com/gsi/client" async defer></script>

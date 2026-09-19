@@ -280,8 +280,79 @@ function initTheme() {
     }
 }
 
+function initPartnershipForm() {
+    const form = document.getElementById("partnershipForm");
+    if (!form) return;
+
+    const submitBtn = document.getElementById("contactSubmitBtn");
+    const formStatus = document.getElementById("formStatus");
+    const btnText = submitBtn ? submitBtn.querySelector(".btn-text") : null;
+    const btnSpinner = submitBtn ? submitBtn.querySelector(".btn-spinner") : null;
+
+    form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+
+        if (!form.checkValidity()) {
+            form.reportValidity();
+            return;
+        }
+
+        if (submitBtn) submitBtn.disabled = true;
+        if (btnText && btnSpinner) {
+            btnText.style.display = "none";
+            btnSpinner.style.display = "inline";
+        }
+        if (formStatus) {
+            formStatus.className = "form-status show loading";
+            formStatus.textContent = "문의를 전송하는 중입니다...";
+        }
+
+        try {
+            const formData = new FormData(form);
+            const response = await fetch(form.action, {
+                method: "POST",
+                body: formData,
+                headers: {
+                    "Accept": "application/json"
+                }
+            });
+
+            if (response.ok) {
+                form.reset();
+                if (formStatus) {
+                    formStatus.className = "form-status show success";
+                    formStatus.textContent = "✅ 제휴 문의가 성공적으로 접수되었습니다. 담당자 검토 후 신속히 연락드리겠습니다.";
+                }
+            } else {
+                const data = await response.json().catch(() => null);
+                let errMsg = "전송 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.";
+                if (data && data.errors && data.errors.length > 0) {
+                    errMsg = data.errors.map(err => err.message).join(", ");
+                }
+                if (formStatus) {
+                    formStatus.className = "form-status show error";
+                    formStatus.textContent = `❌ ${errMsg}`;
+                }
+            }
+        } catch (error) {
+            console.error("Formspree submit error:", error);
+            if (formStatus) {
+                formStatus.className = "form-status show error";
+                formStatus.textContent = "❌ 네트워크 오류가 발생했습니다. 인터넷 연결을 확인해주세요.";
+            }
+        } finally {
+            if (submitBtn) submitBtn.disabled = false;
+            if (btnText && btnSpinner) {
+                btnText.style.display = "inline";
+                btnSpinner.style.display = "none";
+            }
+        }
+    });
+}
+
 initTheme();
 initGoogleLogin();
+initPartnershipForm();
 
 renderAnalysisChart();
 renderHistoryRows();
