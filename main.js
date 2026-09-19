@@ -1,242 +1,308 @@
-function generateNumbers() {
-    let numbers = [];
+// ==========================================
+// AI Animal Face Classifier (Teachable Machine)
+// ==========================================
+const MODEL_URL = "https://teachablemachine.withgoogle.com/models/3CAvzZ5dQ/";
 
-    while (numbers.length < 6) {
-        let number = Math.floor(Math.random() * 45) + 1;
+let model = null;
+let isModelLoading = false;
 
-        if (!numbers.includes(number)) {
-            numbers.push(number);
-        }
-    }
-
-    numbers.sort(function(a, b) {
-        return a - b;
-    });
-
-    return numbers;
-}
-
-function getBallColor(number) {
-    if (number <= 10) {
-        return "yellow";
-    }
-
-    if (number <= 20) {
-        return "blue";
-    }
-
-    if (number <= 30) {
-        return "red";
-    }
-
-    if (number <= 40) {
-        return "gray";
-    }
-
-    return "green";
-}
-
-function renderAnalysisChart() {
-    const analysisChart = document.getElementById("analysisChart");
-    if (!analysisChart) return;
-
-    const distribution = {
-        "01~10": [12, 74],
-        "11~20": [8, 43],
-        "21~30": [11, 66],
-        "31~40": [10, 58],
-        "41~45": [4, 21]
-    };
-
-    analysisChart.innerHTML = "";
-
-    Object.entries(distribution).forEach(([label, [count, percent]]) => {
-        const row = document.createElement("div");
-        row.className = "chart-row";
-
-        const labelSpan = document.createElement("span");
-        labelSpan.className = "chart-label";
-        labelSpan.textContent = label;
-
-        const track = document.createElement("span");
-        track.className = "chart-track";
-
-        const bar = document.createElement("span");
-        bar.className = "chart-bar";
-        bar.style.width = percent + "%";
-
-        track.appendChild(bar);
-
-        const countSpan = document.createElement("span");
-        countSpan.className = "chart-count";
-        countSpan.textContent = count;
-
-        row.appendChild(labelSpan);
-        row.appendChild(track);
-        row.appendChild(countSpan);
-
-        analysisChart.appendChild(row);
-    });
-}
-
-function renderHistoryRows() {
-    const rows = [
-        { round: 1047, date: "2026.09.11", numbers: [5, 15, 24, 31, 39, 42], bonus: 7, prize: "1등 18명" },
-        { round: 1046, date: "2026.09.08", numbers: [2, 11, 19, 27, 34, 37], bonus: 12, prize: "1등 24명" },
-        { round: 1045, date: "2026.09.04", numbers: [3, 10, 16, 22, 33, 44], bonus: 38, prize: "1등 12명" }
-    ];
-
-    const historyRows = document.getElementById("historyRows");
-    if (!historyRows) return;
-
-    historyRows.innerHTML = "";
-
-    rows.forEach((item) => {
-        const row = document.createElement("div");
-        row.className = "history-row";
-
-        const round = document.createElement("span");
-        round.className = "history-round";
-        round.textContent = item.round + "회";
-
-        const date = document.createElement("span");
-        date.className = "history-date";
-        date.textContent = item.date;
-
-        const numbers = document.createElement("span");
-        numbers.className = "history-numbers";
-        numbers.textContent = item.numbers.concat(item.bonus).map((n) => String(n).padStart(2, "0")).join(" ");
-
-        const prize = document.createElement("span");
-        prize.className = "history-prize";
-        prize.textContent = item.prize;
-
-        row.appendChild(round);
-        row.appendChild(date);
-        row.appendChild(numbers);
-        row.appendChild(prize);
-
-        historyRows.appendChild(row);
-    });
-}
-
-function recommendLotto() {
-    const results = document.getElementById("results");
-    if (!results) return;
-
-    results.innerHTML = "";
-
-    for (let game = 1; game <= 5; game++) {
-        const numbers = generateNumbers();
-        const card = document.createElement("div");
-        card.className = "lotto-card";
-
-        const title = document.createElement("div");
-        title.className = "game-title";
-        title.textContent = game + "게임";
-        card.appendChild(title);
-
-        const numberArea = document.createElement("div");
-        numberArea.className = "numbers";
-
-        numbers.forEach(function(number) {
-            const ball = document.createElement("div");
-            ball.className = "ball " + getBallColor(number);
-            ball.textContent = number;
-            numberArea.appendChild(ball);
-        });
-
-        let bonus;
-        do {
-            bonus = Math.floor(Math.random() * 45) + 1;
-        } while (numbers.includes(bonus));
-
-        const plus = document.createElement("div");
-        plus.className = "plus";
-        plus.textContent = "+";
-        numberArea.appendChild(plus);
-
-        const bonusBall = document.createElement("div");
-        bonusBall.className = "ball " + getBallColor(bonus);
-        bonusBall.textContent = bonus;
-        numberArea.appendChild(bonusBall);
-
-        card.appendChild(numberArea);
-
-        const bonusText = document.createElement("div");
-        bonusText.className = "bonus";
-        bonusText.textContent = "보너스 번호";
-        card.appendChild(bonusText);
-
-        results.appendChild(card);
-    }
-}
-
-const recommendButton = document.getElementById("recommendBtn");
-const shuffleButton = document.getElementById("shuffleBtn");
-const googleLoginButton = document.getElementById("googleLoginBtn");
-const loginStatus = document.getElementById("loginStatus");
-
-const GOOGLE_CLIENT_ID = "YOUR_GOOGLE_CLIENT_ID.apps.googleusercontent.com";
-
-function setLoginStatus(message, isError = false) {
-    if (!loginStatus) return;
-
-    loginStatus.textContent = message;
-    loginStatus.style.color = isError ? "#d93b3b" : "#3ca66a";
-}
-
-function handleGoogleCredentialResponse(response) {
-    if (!response?.credential) {
-        setLoginStatus("구글 로그인에 실패했습니다. 다시 시도해 주세요.", true);
-        return;
-    }
-
+// Preload Teachable Machine Model
+async function loadAnimalModel() {
+    if (model || isModelLoading) return model;
+    isModelLoading = true;
     try {
-        const payload = JSON.parse(atob(response.credential.split(".")[1]));
-        setLoginStatus(`${payload.name ?? "사용자"}님, 구글 로그인 성공!`);
-        console.log("Google user info:", payload);
+        const modelURL = MODEL_URL + "model.json";
+        const metadataURL = MODEL_URL + "metadata.json";
+        model = await tmImage.load(modelURL, metadataURL);
+        console.log("Teachable Machine Animal Model loaded successfully!");
+        return model;
     } catch (error) {
-        console.error("Failed to parse Google credential:", error);
-        setLoginStatus("로그인 정보를 확인하는 중 오류가 발생했습니다.", true);
+        console.error("Failed to load Teachable Machine model:", error);
+        showToast("AI 모델을 불러오는 중 오류가 발생했습니다. 새로고침 후 다시 시도해주세요.");
+        return null;
+    } finally {
+        isModelLoading = false;
     }
 }
 
-function initGoogleLogin() {
-    if (!googleLoginButton) return;
+// Animal Classification Results Data
+const ANIMAL_INFO = {
+    dog: {
+        badge: "🐶 사랑스러운 강아지상",
+        title: "다정하고 사랑스러운 멍뭉미!",
+        subtitle: "보는 순간 무장해제! 누구에게나 호감을 주는 최고의 친화력",
+        tags: ["#선한눈매", "#친근함", "#애교만점", "#비타민에너지", "#멍뭉미", "#무장해제미소", "#배려심"],
+        desc: "따뜻하고 다정한 눈빛과 서글서글한 인상으로 주변 사람들을 편안하고 행복하게 만들어주는 강아지상입니다. 밝고 긍정적인 에너지를 지니고 있어 친구나 동료들에게 늘 인기가 많으며, 애교 넘치고 배려심이 깊어 깊은 신뢰감을 줍니다. 웃을 때 반달눈이 되거나 입꼬리가 시원하게 올라가는 것이 가장 큰 매력 포인트입니다!",
+        celebs: "박보검, 송중기, 정해인, 박보영, 츄, 아이유, 백현, 강다니엘 등"
+    },
+    cat: {
+        badge: "🐱 도도하고 매력적인 고양이상",
+        title: "도도하고 치명적인 분위기 장인!",
+        subtitle: "시크한 첫인상 뒤에 숨겨진 치명적인 반전 매력의 소유자",
+        tags: ["#시크도도", "#치명적매력", "#분위기장인", "#세련된눈매", "#반전매력", "#츤데레", "#신비주의"],
+        desc: "매혹적이고 날렵한 눈매와 세련된 페이스 라인으로 신비로운 아우라를 자아내는 고양이상입니다. 첫인상은 쿨하고 도도해 보여 쉽게 다가가기 어려울 수 있지만, 한번 친해지면 숨겨왔던 반전 애교와 섬세함으로 상대방을 완전히 매료시키는 치명적인 매력을 가지고 있습니다. 조용히 바라보는 눈빛만으로도 시선을 사로잡는 분위기 미남/미녀입니다!",
+        celebs: "강동원, 이준기, 제니, 예지(ITZY), 안소희, 한소희, 시우민, 뷔(BTS) 등"
+    }
+};
 
-    if (!GOOGLE_CLIENT_ID || GOOGLE_CLIENT_ID.includes("YOUR_")) {
-        googleLoginButton.addEventListener("click", () => {
-            setLoginStatus("Google Client ID를 설정해야 구글 로그인이 연결됩니다.", true);
+// UI Elements
+const dropZone = document.getElementById("dropZone");
+const imageUpload = document.getElementById("imageUpload");
+const uploadBtn = document.getElementById("uploadBtn");
+const resultCard = document.getElementById("resultCard");
+const previewImage = document.getElementById("previewImage");
+const scanningLine = document.getElementById("scanningLine");
+const loadingStatus = document.getElementById("loadingStatus");
+const loadingText = document.getElementById("loadingText");
+const resultDetails = document.getElementById("resultDetails");
+
+const resultBadge = document.getElementById("resultBadge");
+const resultTitle = document.getElementById("resultTitle");
+const resultSubtitle = document.getElementById("resultSubtitle");
+const resultTags = document.getElementById("resultTags");
+const resultDesc = document.getElementById("resultDesc");
+const resultCelebs = document.getElementById("resultCelebs");
+
+const dogBar = document.getElementById("dogBar");
+const dogPercent = document.getElementById("dogPercent");
+const catBar = document.getElementById("catBar");
+const catPercent = document.getElementById("catPercent");
+
+const retryBtn = document.getElementById("retryBtn");
+const shareBtn = document.getElementById("shareBtn");
+const toast = document.getElementById("toast");
+
+// Toast Notification
+function showToast(message, duration = 3000) {
+    if (!toast) return;
+    toast.textContent = message;
+    toast.classList.add("show");
+    setTimeout(() => {
+        toast.classList.remove("show");
+    }, duration);
+}
+
+// Drag & Drop Handlers
+if (dropZone && imageUpload && uploadBtn) {
+    uploadBtn.addEventListener("click", () => {
+        imageUpload.click();
+    });
+
+    dropZone.addEventListener("click", (e) => {
+        if (e.target !== uploadBtn && !uploadBtn.contains(e.target)) {
+            imageUpload.click();
+        }
+    });
+
+    ["dragenter", "dragover"].forEach(eventName => {
+        dropZone.addEventListener(eventName, (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            dropZone.classList.add("dragover");
         });
+    });
+
+    ["dragleave", "dragend", "drop"].forEach(eventName => {
+        dropZone.addEventListener(eventName, (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            dropZone.classList.remove("dragover");
+        });
+    });
+
+    dropZone.addEventListener("drop", (e) => {
+        const files = e.dataTransfer.files;
+        if (files && files.length > 0) {
+            handleSelectedFile(files[0]);
+        }
+    });
+
+    imageUpload.addEventListener("change", (e) => {
+        const files = e.target.files;
+        if (files && files.length > 0) {
+            handleSelectedFile(files[0]);
+        }
+    });
+}
+
+// Process Image File
+function handleSelectedFile(file) {
+    if (!file.type.startsWith("image/")) {
+        showToast("이미지 파일(JPG, PNG, WEBP 등)만 업로드할 수 있습니다.");
         return;
     }
 
-    if (!window.google || !window.google.accounts || !window.google.accounts.id) {
-        googleLoginButton.addEventListener("click", () => {
-            setLoginStatus("Google 로그인 스크립트가 아직 로드되지 않았습니다.", true);
-        });
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        startClassification(e.target.result);
+    };
+    reader.readAsDataURL(file);
+}
+
+// Start AI Classification
+async function startClassification(imageSrc) {
+    // Hide dropzone, show result container
+    dropZone.style.display = "none";
+    resultCard.style.display = "block";
+    resultDetails.style.display = "none";
+    loadingStatus.style.display = "flex";
+    if (scanningLine) scanningLine.style.display = "block";
+
+    previewImage.src = imageSrc;
+
+    // Loading status animation texts
+    if (loadingText) loadingText.textContent = "AI 모델 준비 중...";
+
+    // Ensure model is ready
+    let loadedModel = model;
+    if (!loadedModel) {
+        loadedModel = await loadAnimalModel();
+    }
+
+    if (!loadedModel) {
+        showToast("AI 모델을 불러오지 못했습니다. 다시 시도해주세요.");
+        resetTest();
         return;
     }
 
-    window.google.accounts.id.initialize({
-        client_id: GOOGLE_CLIENT_ID,
-        callback: handleGoogleCredentialResponse
+    if (loadingText) loadingText.textContent = "얼굴 특징 랜드마크 분석 중...";
+
+    previewImage.onload = async () => {
+        try {
+            if (loadingText) loadingText.textContent = "강아지상 vs 고양이상 확률 계산 중...";
+            
+            // Artificial tiny delay for premium smooth UX
+            await new Promise(r => setTimeout(r, 600));
+
+            const predictions = await loadedModel.predict(previewImage);
+            renderResults(predictions);
+        } catch (error) {
+            console.error("Prediction error:", error);
+            showToast("이미지 분석 중 오류가 발생했습니다. 다른 사진으로 시도해주세요.");
+            resetTest();
+        }
+    };
+}
+
+// Render Classification Results
+function renderResults(predictions) {
+    let dogScore = 0;
+    let catScore = 0;
+
+    predictions.forEach(p => {
+        const name = p.className.toLowerCase();
+        if (name.includes("강아지") || name.includes("dog")) {
+            dogScore = p.probability;
+        } else if (name.includes("고양이") || name.includes("cat")) {
+            catScore = p.probability;
+        }
     });
 
-    googleLoginButton.addEventListener("click", () => {
-        window.google.accounts.id.prompt();
+    // Fallback if class names differed
+    if (dogScore === 0 && catScore === 0 && predictions.length >= 2) {
+        dogScore = predictions[0].probability;
+        catScore = predictions[1].probability;
+    }
+
+    const dogPct = Math.round(dogScore * 100);
+    const catPct = Math.round(catScore * 100);
+
+    const isDogWinner = dogScore >= catScore;
+    const animalKey = isDogWinner ? "dog" : "cat";
+    const data = ANIMAL_INFO[animalKey];
+
+    // Populate UI
+    if (resultBadge) {
+        resultBadge.textContent = data.badge;
+        resultBadge.className = `result-badge ${animalKey}-badge`;
+    }
+    if (resultTitle) resultTitle.textContent = data.title;
+    if (resultSubtitle) resultSubtitle.textContent = data.subtitle;
+    if (resultDesc) resultDesc.textContent = data.desc;
+    if (resultCelebs) resultCelebs.textContent = data.celebs;
+
+    // Tags
+    if (resultTags) {
+        resultTags.innerHTML = "";
+        data.tags.forEach(tag => {
+            const span = document.createElement("span");
+            span.className = "tag-pill";
+            span.textContent = tag;
+            resultTags.appendChild(span);
+        });
+    }
+
+    // Probability Bars
+    if (dogPercent) dogPercent.textContent = `${dogPct}%`;
+    if (catPercent) catPercent.textContent = `${catPct}%`;
+
+    // Hide loading, show details
+    if (scanningLine) scanningLine.style.display = "none";
+    loadingStatus.style.display = "none";
+    resultDetails.style.display = "block";
+
+    // Trigger bar fill animation
+    setTimeout(() => {
+        if (dogBar) dogBar.style.width = `${dogPct}%`;
+        if (catBar) catBar.style.width = `${catPct}%`;
+    }, 100);
+}
+
+// Reset / Retry
+function resetTest() {
+    if (imageUpload) imageUpload.value = "";
+    if (previewImage) previewImage.src = "";
+    if (dogBar) dogBar.style.width = "0%";
+    if (catBar) catBar.style.width = "0%";
+    if (resultCard) resultCard.style.display = "none";
+    if (dropZone) dropZone.style.display = "flex";
+    window.scrollTo({ top: dropZone.offsetTop - 100, behavior: "smooth" });
+}
+
+if (retryBtn) {
+    retryBtn.addEventListener("click", resetTest);
+}
+
+// Share Button
+if (shareBtn) {
+    shareBtn.addEventListener("click", async () => {
+        const shareData = {
+            title: "AI 동물상 테스트 | 강아지상 vs 고양이상",
+            text: "인공지능이 분석한 내 얼굴의 동물상은? 지금 바로 무료로 테스트해보세요!",
+            url: window.location.href
+        };
+
+        if (navigator.share && navigator.canShare && navigator.canShare(shareData)) {
+            try {
+                await navigator.share(shareData);
+                return;
+            } catch (err) {
+                if (err.name !== "AbortError") {
+                    console.log("Share failed, falling back to clipboard:", err);
+                } else {
+                    return;
+                }
+            }
+        }
+
+        // Clipboard fallback
+        try {
+            await navigator.clipboard.writeText(window.location.href);
+            showToast("🔗 결과 링크가 클립보드에 복사되었습니다!");
+        } catch (e) {
+            // Older browser fallback
+            const input = document.createElement("input");
+            input.value = window.location.href;
+            document.body.appendChild(input);
+            input.select();
+            document.execCommand("copy");
+            document.body.removeChild(input);
+            showToast("🔗 결과 링크가 클립보드에 복사되었습니다!");
+        }
     });
 }
 
-if (recommendButton) {
-    recommendButton.addEventListener("click", recommendLotto);
-}
-
-if (shuffleButton) {
-    shuffleButton.addEventListener("click", recommendLotto);
-}
-
+// Theme Switching
 function initTheme() {
     const themeToggle = document.getElementById("themeToggle");
     const themeLabel = document.getElementById("themeLabel");
@@ -259,6 +325,7 @@ function initTheme() {
             themeToggle.setAttribute("title", label);
         }
 
+        // Reset Disqus to adapt to new theme colors
         if (window.DISQUS && typeof window.DISQUS.reset === "function") {
             try {
                 window.DISQUS.reset({ reload: true });
@@ -288,6 +355,7 @@ function initTheme() {
     }
 }
 
+// Formspree Partnership Inquiry
 function initPartnershipForm() {
     const form = document.getElementById("partnershipForm");
     if (!form) return;
@@ -358,10 +426,9 @@ function initPartnershipForm() {
     });
 }
 
-initTheme();
-initGoogleLogin();
-initPartnershipForm();
-
-renderAnalysisChart();
-renderHistoryRows();
-recommendLotto();
+// Initialize on DOM ready
+document.addEventListener("DOMContentLoaded", () => {
+    initTheme();
+    initPartnershipForm();
+    loadAnimalModel(); // Start preloading Teachable Machine model
+});

@@ -3,7 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lucky Six | 로또 추천</title>
+    <title>AI 동물상 테스트 | 나는 강아지상일까, 고양이상일까?</title>
+    <meta name="description" content="인공지능이 분석하는 나의 동물상 테스트! 수만 장의 사진 데이터로 학습된 AI가 강아지상과 고양이상 일치율을 즉시 분석해드립니다.">
+    <meta property="og:title" content="AI 동물상 테스트 | 강아지상 vs 고양이상">
+    <meta property="og:description" content="나는 사랑스러운 강아지상일까, 도도한 고양이상일까? 사진을 올려 바로 확인해보세요!">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=800&auto=format&fit=crop">
     <link rel="stylesheet" href="style.css">
     <script>
         (function() {
@@ -18,13 +23,12 @@
     <header class="site-header">
         <nav class="nav">
             <a class="brand" href="#">
-                <span class="brand-mark">L</span>
-                <span>Lucky Six</span>
+                <span class="brand-mark">🐾</span>
+                <span>동물상 테스트</span>
             </a>
             <div class="nav-links">
-                <a class="active" href="#">로또 추천</a>
-                <a href="#analysisChart">번호 분석</a>
-                <a href="#historyRows">회차 정보</a>
+                <a class="active" href="#test">테스트</a>
+                <a href="#guide">동물상 특징</a>
                 <a href="#comments">댓글 & 커뮤니티</a>
                 <a href="#contact">제휴 문의</a>
             </div>
@@ -33,189 +37,168 @@
                     <span class="theme-icon">🌙</span>
                     <span class="theme-label" id="themeLabel">다크모드</span>
                 </button>
-                <button class="login" id="googleLoginBtn" type="button">구글 로그인</button>
-                <span class="login-status" id="loginStatus" aria-live="polite"></span>
             </div>
         </nav>
     </header>
 
     <main class="main">
-        <section class="hero">
-            <section class="hero-copy">
-                <div class="section-label">Today’s Recommendation</div>
-                <h1>당신의 <span>행운 번호</span><br>추천</h1>
+        <!-- Hero & Test Section -->
+        <section class="test-hero-section" id="test">
+            <div class="hero-header">
+                <div class="section-label">AI Vision Animal Face Classifier</div>
+                <h1>나는 <span>강아지상</span>일까?<br><span>고양이상</span>일까?</h1>
                 <p class="subline">
-                    새로운 조합을 매일 생성하고, 번호 패턴을 한눈에 확인하며 오늘의 로또 행운을 준비해보세요.
+                    Google Teachable Machine으로 학습된 인공지능이 얼굴 사진을 분석하여<br>
+                    강아지상과 고양이상 확률 및 상세한 매력 포인트를 찾아드립니다.
                 </p>
-                <div class="hero-actions">
-                    <button class="btn btn-primary" id="recommendBtn">🎯 번호 추천받기</button>
-                    <button class="btn btn-secondary">분석 보기</button>
+                <div class="hero-badges">
+                    <span class="badge-pill">⚡ 실시간 AI 분석</span>
+                    <span class="badge-pill">🔒 100% 프라이버시 보호</span>
+                    <span class="badge-pill">무료 테스트</span>
                 </div>
-                <div class="hero-meta">
-                    <span>다음 회차</span>
-                    <span class="divider">|</span>
-                    <span>1047회</span>
-                    <span class="divider">|</span>
-                    <span>2026년 09월 11일</span>
-                </div>
-            </section>
+            </div>
 
-            <aside class="hero-panel">
-                <div class="panel-head">
-                    <span class="title">이번 주 추첨</span>
-                    <span class="chip">LIVE</span>
+            <!-- Upload & Test Box -->
+            <div class="test-container-card">
+                <!-- Drop Zone (Initial State) -->
+                <div class="upload-dropzone" id="dropZone">
+                    <input type="file" id="imageUpload" accept="image/*" style="display: none;">
+                    <div class="dropzone-icon">📸</div>
+                    <h3 class="dropzone-title">얼굴 사진을 이곳에 끌어다 놓으세요</h3>
+                    <p class="dropzone-sub">또는 아래 버튼을 눌러 사진을 직접 선택할 수 있습니다</p>
+                    <button type="button" class="btn btn-primary upload-btn" id="uploadBtn">
+                        <span>사진 업로드하기</span>
+                    </button>
+                    <p class="dropzone-tip">💡 정면 얼굴이 선명하게 나온 사진일수록 정확도가 높아집니다.</p>
                 </div>
-                <div class="jackpot">
-                    <div class="label">총 상금</div>
-                    <div class="amount">₩ 11.2억</div>
+
+                <!-- Result Box (Hidden by default) -->
+                <div class="result-box" id="resultCard" style="display: none;">
+                    <div class="result-grid">
+                        <div class="preview-column">
+                            <div class="image-preview-wrapper">
+                                <img id="previewImage" alt="업로드된 사진">
+                                <div class="scanning-line" id="scanningLine"></div>
+                            </div>
+                            <div class="loading-status" id="loadingStatus">
+                                <div class="spinner-ring"></div>
+                                <p class="loading-text" id="loadingText">AI가 얼굴 특징을 분석하고 있습니다...</p>
+                            </div>
+                        </div>
+
+                        <div class="analysis-column" id="resultDetails" style="display: none;">
+                            <div class="result-header">
+                                <span class="result-badge" id="resultBadge">🐶 강아지상</span>
+                                <h2 class="result-title" id="resultTitle">다정하고 사랑스러운 멍뭉미!</h2>
+                                <p class="result-subtitle" id="resultSubtitle">선한 눈매와 친근한 미소로 누구에게나 호감을 주는 매력의 소유자!</p>
+                            </div>
+
+                            <div class="tag-cloud" id="resultTags"></div>
+
+                            <div class="result-desc-card">
+                                <h4>✨ 얼굴 특징 및 매력 분석</h4>
+                                <p id="resultDesc"></p>
+                            </div>
+
+                            <div class="result-celebs" id="resultCelebsBox">
+                                <span class="celeb-label">🌟 대표 연예인</span>
+                                <p class="celeb-list" id="resultCelebs"></p>
+                            </div>
+
+                            <!-- Probability Bars -->
+                            <div class="probability-section">
+                                <h4 class="prob-heading">📊 동물상 일치율 분석 결과</h4>
+                                
+                                <div class="prob-item">
+                                    <div class="prob-info">
+                                        <span class="prob-label">🐶 강아지상</span>
+                                        <span class="prob-val" id="dogPercent">0%</span>
+                                    </div>
+                                    <div class="prob-bar-track">
+                                        <div class="prob-bar-fill dog-bar" id="dogBar" style="width: 0%;"></div>
+                                    </div>
+                                </div>
+
+                                <div class="prob-item">
+                                    <div class="prob-info">
+                                        <span class="prob-label">🐱 고양이상</span>
+                                        <span class="prob-val" id="catPercent">0%</span>
+                                    </div>
+                                    <div class="prob-bar-track">
+                                        <div class="prob-bar-fill cat-bar" id="catBar" style="width: 0%;"></div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="result-actions">
+                                <button type="button" class="btn btn-primary action-btn" id="retryBtn">
+                                    <span>🔄 다른 사진으로 다시하기</span>
+                                </button>
+                                <button type="button" class="btn btn-secondary action-btn" id="shareBtn">
+                                    <span>🔗 결과 공유하기</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
                 </div>
-                <div class="panel-grid">
-                    <div class="grid-card">
-                        <div class="mini-label">추천 번호</div>
-                        <div class="mini-value" id="todayCount">06</div>
-                    </div>
-                    <div class="grid-card">
-                        <div class="mini-label">추천 방식</div>
-                        <div class="mini-value">랜덤</div>
-                    </div>
-                    <div class="grid-card">
-                        <div class="mini-label">당첨 등수</div>
-                        <div class="mini-value">1~5</div>
-                    </div>
-                    <div class="grid-card">
-                        <div class="mini-label">회차</div>
-                        <div class="mini-value">1047</div>
-                    </div>
+
+                <div class="privacy-banner">
+                    <span class="privacy-icon">🔒</span>
+                    <span class="privacy-text">
+                        업로드하신 사진은 서버에 전송되거나 저장되지 않으며, 사용자 기기(웹 브라우저) 내부에서만 안전하게 분석됩니다.
+                    </span>
                 </div>
-            </aside>
+            </div>
         </section>
 
-        <section class="recommend-section">
+        <!-- Animal Face Guide Section -->
+        <section class="guide-section" id="guide">
             <div class="section-top">
-                <div class="section-title"><span>추천 조합</span> 5개</div>
-                <div class="actions">
-                    <button class="small-btn" id="shuffleBtn">새 조합 생성</button>
-                </div>
+                <div class="section-title"><span>동물상 특징</span> 비교 가이드</div>
+                <span class="chip">강아지상 vs 고양이상</span>
             </div>
+            <p class="guide-intro">
+                대표적인 두 가지 동물상! 어떤 특징과 매력의 차이가 있는지 한눈에 비교해보세요.
+            </p>
 
-            <section class="results-grid" id="results"></section>
-
-            <div class="notice">
-                ⚠️ 추천 번호는 무작위 알고리즘으로 생성된 예시 정보이며, 당첨을 보장하지 않습니다.
-            </div>
-        </section>
-
-        <section class="stats-strip">
-            <article class="stat-card">
-                <span class="stat-icon">✦</span>
-                <div class="stat-body">
-                    <span class="label">오늘의 추천</span>
-                    <span class="value">5게임</span>
-                </div>
-            </article>
-            <article class="stat-card">
-                <span class="stat-icon">☄</span>
-                <div class="stat-body">
-                    <span class="label">분석 포인트</span>
-                    <span class="value">12</span>
-                </div>
-            </article>
-            <article class="stat-card">
-                <span class="stat-icon">☍</span>
-                <div class="stat-body">
-                    <span class="label">행운 확률</span>
-                    <span class="value">+23%</span>
-                </div>
-            </article>
-        </section>
-
-        <section class="dashboard-section">
-            <article class="dashboard-card analysis-card">
-                <div class="dash-head">
-                    <div class="dash-title"><span>번호 분석</span></div>
-                    <span class="dash-tag">패턴 보기</span>
-                </div>
-                <div class="chart" id="analysisChart">
-                    <div class="chart-row">
-                        <span class="chart-label">01~10</span>
-                        <span class="chart-track"><span class="chart-bar" style="width:74%"></span></span>
-                        <span class="chart-count">12</span>
+            <div class="guide-grid">
+                <article class="guide-card dog-guide">
+                    <div class="guide-card-head">
+                        <span class="guide-card-icon">🐶</span>
+                        <div>
+                            <h3>사랑스러운 강아지상</h3>
+                            <span class="guide-card-sub">친근함 · 다정함 · 애교만점</span>
+                        </div>
                     </div>
-                    <div class="chart-row">
-                        <span class="chart-label">11~20</span>
-                        <span class="chart-track"><span class="chart-bar" style="width:43%"></span></span>
-                        <span class="chart-count">8</span>
-                    </div>
-                    <div class="chart-row">
-                        <span class="chart-label">21~30</span>
-                        <span class="chart-track"><span class="chart-bar" style="width:66%"></span></span>
-                        <span class="chart-count">11</span>
-                    </div>
-                    <div class="chart-row">
-                        <span class="chart-label">31~40</span>
-                        <span class="chart-track"><span class="chart-bar" style="width:58%"></span></span>
-                        <span class="chart-count">10</span>
-                    </div>
-                    <div class="chart-row">
-                        <span class="chart-label">41~45</span>
-                        <span class="chart-track"><span class="chart-bar" style="width:21%"></span></span>
-                        <span class="chart-count">4</span>
-                    </div>
-                </div>
-            </article>
+                    <ul class="guide-list">
+                        <li><strong>눈매:</strong> 둥글고 크며, 눈꼬리가 살짝 내려가 순하고 다정한 인상</li>
+                        <li><strong>코 & 입:</strong> 둥글둥글한 코끝과 웃을 때 시원하게 올라가는 입꼬리</li>
+                        <li><strong>첫인상:</strong> 처음 보는 사람도 무장해제시키는 서글서글한 친화력</li>
+                        <li><strong>매력 포인트:</strong> 함께 있으면 마음이 편안해지고 활력을 주는 비타민 에너지</li>
+                        <li><strong>대표 연예인:</strong> 박보검, 송중기, 정해인, 박보영, 츄, 아이유, 백현 등</li>
+                    </ul>
+                </article>
 
-            <article class="dashboard-card latest-card">
-                <div class="dash-head">
-                    <div class="dash-title"><span>최근 추첨 결과</span></div>
-                    <span class="dash-tag">1047회</span>
-                </div>
-                <div class="latest-date">2026년 09월 11일</div>
-                <div class="latest-numbers">
-                    <span class="ball yellow">05</span>
-                    <span class="ball blue">15</span>
-                    <span class="ball red">24</span>
-                    <span class="ball gray">31</span>
-                    <span class="ball green">39</span>
-                    <span class="ball yellow">42</span>
-                    <span class="plus">+</span>
-                    <span class="ball red">07</span>
-                </div>
-                <div class="latest-summary">
-                    <span class="summary-row"><strong>1등</strong> 18명</span>
-                    <span class="summary-row"><strong>당첨금</strong> 8,624,370원</span>
-                </div>
-            </article>
-        </section>
-
-        <section class="history-section">
-            <div class="section-top">
-                <div class="section-title"><span>회차 정보</span></div>
-                <div class="actions">
-                    <button class="small-btn">전체 보기</button>
-                </div>
-            </div>
-            <div class="history-list" id="historyRows">
-                <div class="history-row">
-                    <span class="history-round">1047회</span>
-                    <span class="history-date">2026.09.11</span>
-                    <span class="history-numbers">05 15 24 31 39 42 + 07</span>
-                    <span class="history-prize">1등 18명</span>
-                </div>
-                <div class="history-row">
-                    <span class="history-round">1046회</span>
-                    <span class="history-date">2026.09.08</span>
-                    <span class="history-numbers">02 11 19 27 34 37 + 12</span>
-                    <span class="history-prize">1등 24명</span>
-                </div>
-                <div class="history-row">
-                    <span class="history-round">1045회</span>
-                    <span class="history-date">2026.09.04</span>
-                    <span class="history-numbers">03 10 16 22 33 44 + 38</span>
-                    <span class="history-prize">1등 12명</span>
-                </div>
+                <article class="guide-card cat-guide">
+                    <div class="guide-card-head">
+                        <span class="guide-card-icon">🐱</span>
+                        <div>
+                            <h3>도도한 고양이상</h3>
+                            <span class="guide-card-sub">시크미 · 신비로움 · 반전매력</span>
+                        </div>
+                    </div>
+                    <ul class="guide-list">
+                        <li><strong>눈매:</strong> 눈꼬리가 살짝 올라가거나 가로로 길어 매혹적이고 세련된 눈매</li>
+                        <li><strong>코 & 턱선:</strong> 오뚝하고 날렵한 콧대와 샤프하고 갸름한 턱선</li>
+                        <li><strong>첫인상:</strong> 도도하고 차가워 보이지만 범접할 수 없는 세련된 아우라</li>
+                        <li><strong>매력 포인트:</strong> 알면 알수록 헤어나올 수 없는 츤데레 반전 매력</li>
+                        <li><strong>대표 연예인:</strong> 강동원, 이준기, 제니, 예지, 안소희, 한소희, 시우민 등</li>
+                    </ul>
+                </article>
             </div>
         </section>
 
+        <!-- Disqus Comments Section -->
         <section class="comments-section" id="comments">
             <div class="section-top">
                 <div class="section-title"><span>댓글 & 커뮤니티</span> (Discussion)</div>
@@ -224,7 +207,7 @@
                 </div>
             </div>
             <p class="comments-intro">
-                오늘의 추천 번호, 당첨 후기, 나만의 로또 조합 전략을 자유롭게 나눠보세요!
+                동물상 테스트 결과와 나의 매력 포인트를 자유롭게 공유하고 이야기 나눠보세요!
             </p>
             <div class="disqus-container">
                 <div id="disqus_thread"></div>
@@ -234,7 +217,7 @@
                     *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables    */
                     var disqus_config = function () {
                         this.page.url = window.location.origin + window.location.pathname;
-                        this.page.identifier = 'luckysix-main';
+                        this.page.identifier = 'animal-face-test';
                     };
                     (function() { // DON'T EDIT BELOW THIS LINE
                         var d = document, s = d.createElement('script');
@@ -247,6 +230,7 @@
             </div>
         </section>
 
+        <!-- Formspree Partnership Contact Section -->
         <section class="contact-section" id="contact">
             <div class="section-top">
                 <div class="section-title"><span>제휴 문의</span> (Partnership)</div>
@@ -255,13 +239,12 @@
                 </div>
             </div>
             <p class="contact-intro">
-                Lucky Six와의 광고, 비즈니스 협력, 데이터 제휴 등 다양한 제안을 환영합니다.<br>
+                광고, 비즈니스 협력, 서비스 연계 등 다양한 제휴 제안을 환영합니다.<br>
                 남겨주신 내용은 담당자 검토 후 기재해주신 이메일 또는 연락처로 신속히 답변드리겠습니다.
             </p>
 
             <form class="contact-form" id="partnershipForm" action="https://formspree.io/f/mbglleyp" method="POST">
-                <!-- Formspree 메일 제목 자동 설정 -->
-                <input type="hidden" name="_subject" value="[Lucky Six] 새로운 제휴 문의가 접수되었습니다">
+                <input type="hidden" name="_subject" value="[동물상 테스트] 새로운 제휴 문의가 접수되었습니다">
                 
                 <div class="form-grid">
                     <div class="form-group">
@@ -321,15 +304,24 @@
 
     <footer class="site-footer">
         <div class="footer-inner">
-            <span>© 2026 Lucky Six. All rights reserved.</span>
+            <span>© 2026 AI 동물상 테스트. All rights reserved.</span>
+            <span class="footer-divider">|</span>
+            <a href="#test" class="footer-contact-link">테스트하기</a>
+            <span class="footer-divider">|</span>
+            <a href="#guide" class="footer-contact-link">동물상 특징</a>
             <span class="footer-divider">|</span>
             <a href="#comments" class="footer-contact-link">댓글 & 커뮤니티</a>
             <span class="footer-divider">|</span>
-            <a href="#contact" class="footer-contact-link">제휴 문의 바로가기</a>
+            <a href="#contact" class="footer-contact-link">제휴 문의</a>
         </div>
     </footer>
 
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <!-- Toast Notification Container -->
+    <div class="toast-container" id="toast" role="alert" aria-live="polite"></div>
+
+    <!-- TensorFlow.js & Teachable Machine Image Library -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.3.1/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8.3/dist/teachablemachine-image.min.js"></script>
     <script src="main.js"></script>
 </body>
 </html>
