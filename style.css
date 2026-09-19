@@ -836,11 +836,34 @@
         .recommend-section,
         .dashboard-card,
         .history-section,
+        .comments-section,
         .contact-section,
         .stat-card,
         .small-btn,
         .btn-secondary {
             transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease, box-shadow 0.25s ease;
+        }
+
+        .comments-section {
+            background: var(--paper);
+            border: 1px solid var(--line);
+            border-radius: 28px;
+            padding: 32px;
+            box-shadow: 0 20px 50px var(--shadow);
+            margin-top: 24px;
+        }
+
+        .comments-intro {
+            margin-top: 10px;
+            margin-bottom: 24px;
+            color: var(--muted);
+            font-size: 14px;
+            line-height: 1.7;
+        }
+
+        .disqus-container {
+            margin-top: 16px;
+            min-height: 220px;
         }
 
         .contact-section {
@@ -1099,6 +1122,7 @@
                 grid-template-columns: 1fr;
             }
 
+            .comments-section,
             .contact-section {
                 padding: 24px 20px;
             }

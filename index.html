@@ -25,6 +25,7 @@
                 <a class="active" href="#">로또 추천</a>
                 <a href="#analysisChart">번호 분석</a>
                 <a href="#historyRows">회차 정보</a>
+                <a href="#comments">댓글 & 커뮤니티</a>
                 <a href="#contact">제휴 문의</a>
             </div>
             <div class="nav-actions">
@@ -215,6 +216,37 @@
             </div>
         </section>
 
+        <section class="comments-section" id="comments">
+            <div class="section-top">
+                <div class="section-title"><span>댓글 & 커뮤니티</span> (Discussion)</div>
+                <div class="actions">
+                    <span class="chip">실시간 댓글</span>
+                </div>
+            </div>
+            <p class="comments-intro">
+                오늘의 추천 번호, 당첨 후기, 나만의 로또 조합 전략을 자유롭게 나눠보세요!
+            </p>
+            <div class="disqus-container">
+                <div id="disqus_thread"></div>
+                <script>
+                    /**
+                    *  RECOMMENDED CONFIGURATION VARIABLES: EDIT AND UNCOMMENT THE SECTION BELOW TO INSERT DYNAMIC VALUES FROM YOUR PLATFORM OR CMS.
+                    *  LEARN WHY DEFINING THESE VARIABLES IS IMPORTANT: https://disqus.com/admin/universalcode/#configuration-variables    */
+                    var disqus_config = function () {
+                        this.page.url = window.location.origin + window.location.pathname;
+                        this.page.identifier = 'luckysix-main';
+                    };
+                    (function() { // DON'T EDIT BELOW THIS LINE
+                        var d = document, s = d.createElement('script');
+                        s.src = 'https://productbuilder-xg83vipdcn.disqus.com/embed.js';
+                        s.setAttribute('data-timestamp', +new Date());
+                        (d.head || d.body).appendChild(s);
+                    })();
+                </script>
+                <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+            </div>
+        </section>
+
         <section class="contact-section" id="contact">
             <div class="section-top">
                 <div class="section-title"><span>제휴 문의</span> (Partnership)</div>
@@ -290,6 +322,8 @@
     <footer class="site-footer">
         <div class="footer-inner">
             <span>© 2026 Lucky Six. All rights reserved.</span>
+            <span class="footer-divider">|</span>
+            <a href="#comments" class="footer-contact-link">댓글 & 커뮤니티</a>
             <span class="footer-divider">|</span>
             <a href="#contact" class="footer-contact-link">제휴 문의 바로가기</a>
         </div>

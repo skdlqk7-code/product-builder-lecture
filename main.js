@@ -258,6 +258,14 @@ function initTheme() {
             themeToggle.setAttribute("aria-label", label);
             themeToggle.setAttribute("title", label);
         }
+
+        if (window.DISQUS && typeof window.DISQUS.reset === "function") {
+            try {
+                window.DISQUS.reset({ reload: true });
+            } catch (e) {
+                // Ignore if Disqus is still loading
+            }
+        }
     }
 
     const currentTheme = document.documentElement.getAttribute("data-theme") || "light";
