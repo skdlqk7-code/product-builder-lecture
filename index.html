@@ -4,9 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI 동물상 테스트 | 나는 강아지상일까, 고양이상일까?</title>
-    <meta name="description" content="인공지능이 분석하는 나의 동물상 테스트! 수만 장의 사진 데이터로 학습된 AI가 강아지상과 고양이상 일치율을 즉시 분석해드립니다.">
+    <meta name="description" content="사진을 브라우저에서 분류해 강아지상·고양이상 모델 점수를 확인하는 무료 테스트입니다. 이용 방법, 결과의 한계, 개인정보 처리 방식을 안내합니다.">
+    <link rel="canonical" href="https://product-builder-lecture-4rz.pages.dev/">
     <meta property="og:title" content="AI 동물상 테스트 | 강아지상 vs 고양이상">
-    <meta property="og:description" content="나는 사랑스러운 강아지상일까, 도도한 고양이상일까? 사진을 올려 바로 확인해보세요!">
+    <meta property="og:description" content="사진을 브라우저에서 분류해 강아지상·고양이상 모델 점수를 확인해보세요. 결과의 한계와 개인정보 안내도 확인할 수 있습니다.">
     <meta property="og:type" content="website">
     <meta property="og:image" content="https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=800&auto=format&fit=crop">
     <meta name="google-adsense-account" content="ca-pub-4893452968653112">
@@ -31,9 +32,10 @@
             </a>
             <div class="nav-links">
                 <a class="active" href="#test">테스트</a>
-                <a href="#guide">동물상 특징</a>
-                <a href="#comments">댓글 & 커뮤니티</a>
-                <a href="#contact">제휴 문의</a>
+                <a href="#method">작동 방식</a>
+                <a href="#faq">자주 묻는 질문</a>
+                <a href="#guide">특징 가이드</a>
+                <a href="#contact">문의하기</a>
             </div>
             <div class="nav-actions">
                 <button class="theme-toggle" id="themeToggle" type="button" aria-label="테마 전환" title="테마 전환">
@@ -51,13 +53,13 @@
                 <div class="section-label">AI Vision Animal Face Classifier</div>
                 <h1>나는 <span>강아지상</span>일까?<br><span>고양이상</span>일까?</h1>
                 <p class="subline">
-                    Google Teachable Machine으로 학습된 인공지능이 얼굴 사진을 분석하여<br>
-                    강아지상과 고양이상 확률 및 상세한 매력 포인트를 찾아드립니다.
+                    사진 한 장을 선택하면 이미지 분류 모델이 강아지·고양이 클래스 점수를 보여줍니다.<br>
+                    결과는 재미와 참고를 위한 것으로, 성격이나 실제 외모를 판정하지 않습니다.
                 </p>
                 <div class="hero-badges">
-                    <span class="badge-pill">⚡ 실시간 AI 분석</span>
-                    <span class="badge-pill">🔒 100% 프라이버시 보호</span>
-                    <span class="badge-pill">무료 테스트</span>
+                    <span class="badge-pill">⚡ 브라우저에서 이미지 분류</span>
+                    <span class="badge-pill">🔒 사진은 서비스 서버로 전송하지 않음</span>
+                    <span class="badge-pill">재미·참고용 무료 테스트</span>
                 </div>
             </div>
 
@@ -68,11 +70,11 @@
                     <input type="file" id="imageUpload" accept="image/*" style="display: none;">
                     <div class="dropzone-icon">📸</div>
                     <h3 class="dropzone-title">얼굴 사진을 이곳에 끌어다 놓으세요</h3>
-                    <p class="dropzone-sub">또는 아래 버튼을 눌러 사진을 직접 선택할 수 있습니다</p>
+                    <p class="dropzone-sub">또는 아래 버튼으로 선택하세요 · 이미지 파일 최대 10MB</p>
                     <button type="button" class="btn btn-primary upload-btn" id="uploadBtn">
                         <span>사진 업로드하기</span>
                     </button>
-                    <p class="dropzone-tip">💡 정면 얼굴이 선명하게 나온 사진일수록 정확도가 높아집니다.</p>
+                    <p class="dropzone-tip">💡 인물 한 명이 잘 보이고 밝고 선명한 사진으로 결과를 확인해보세요.</p>
                 </div>
 
                 <!-- Result Box (Hidden by default) -->
@@ -85,7 +87,7 @@
                             </div>
                             <div class="loading-status" id="loadingStatus">
                                 <div class="spinner-ring"></div>
-                                <p class="loading-text" id="loadingText">AI가 얼굴 특징을 분석하고 있습니다...</p>
+                                <p class="loading-text" id="loadingText">선택한 이미지를 준비하고 있습니다...</p>
                             </div>
                         </div>
 
@@ -99,22 +101,22 @@
                             <div class="tag-cloud" id="resultTags"></div>
 
                             <div class="result-desc-card">
-                                <h4>✨ 얼굴 특징 및 매력 분석</h4>
+                                <h4>✨ 모델 결과 설명</h4>
                                 <p id="resultDesc"></p>
                             </div>
 
-                            <div class="result-celebs" id="resultCelebsBox">
-                                <span class="celeb-label">🌟 대표 연예인</span>
-                                <p class="celeb-list" id="resultCelebs"></p>
+                            <div class="result-desc-card">
+                                <h4>결과를 읽을 때 참고하세요</h4>
+                                <p>표시된 수치는 이 모델이 선택한 이미지에 각 분류 점수를 부여한 값입니다. 정확도나 실제 인물의 성격·정체성을 나타내지 않으며, 사진에 따라 달라질 수 있습니다.</p>
                             </div>
 
                             <!-- Probability Bars -->
                             <div class="probability-section">
-                                <h4 class="prob-heading">📊 동물상 일치율 분석 결과</h4>
+                                <h4 class="prob-heading">📊 이미지 분류 모델의 출력 점수</h4>
                                 
                                 <div class="prob-item">
                                     <div class="prob-info">
-                                        <span class="prob-label">🐶 강아지상</span>
+                                        <span class="prob-label">🐶 강아지 클래스</span>
                                         <span class="prob-val" id="dogPercent">0%</span>
                                     </div>
                                     <div class="prob-bar-track">
@@ -124,7 +126,7 @@
 
                                 <div class="prob-item">
                                     <div class="prob-info">
-                                        <span class="prob-label">🐱 고양이상</span>
+                                        <span class="prob-label">🐱 고양이 클래스</span>
                                         <span class="prob-val" id="catPercent">0%</span>
                                     </div>
                                     <div class="prob-bar-track">
@@ -148,9 +150,59 @@
                 <div class="privacy-banner">
                     <span class="privacy-icon">🔒</span>
                     <span class="privacy-text">
-                        업로드하신 사진은 서버에 전송되거나 저장되지 않으며, 사용자 기기(웹 브라우저) 내부에서만 안전하게 분석됩니다.
+                        선택한 사진은 브라우저 안에서 분류에 사용하며 이 사이트 서버로 업로드하지 않습니다. 광고·댓글·모델 파일은 외부 서비스와 연결될 수 있습니다.
+                        <a href="privacy.html">개인정보 처리 안내</a>를 확인하세요.
                     </span>
                 </div>
+            </div>
+        </section>
+
+        <section class="guide-section" id="method">
+            <div class="section-top">
+                <div class="section-title"><span>테스트</span> 작동 방식과 한계</div>
+                <span class="chip">투명한 이용 안내</span>
+            </div>
+            <div class="guide-grid">
+                <article class="guide-card">
+                    <h3>어떻게 분류하나요?</h3>
+                    <p>이 페이지는 Google Teachable Machine 이미지 모델과 TensorFlow.js 기반 라이브러리를 사용합니다. 모델은 선택된 이미지를 강아지·고양이 두 클래스 중 하나로 분류하고 각 클래스의 출력 점수를 보여줍니다. 얼굴 인식이나 얼굴 랜드마크 분석을 수행한다고 주장하지 않습니다.</p>
+                </article>
+                <article class="guide-card">
+                    <h3>점수는 정확도인가요?</h3>
+                    <p>아닙니다. 화면의 퍼센트는 모델이 해당 입력에 대해 계산한 출력값이지, 정답일 확률이나 검증된 정확도 수치가 아닙니다. 모델의 학습 데이터와 독립적인 성능 검증 자료를 이 사이트에서 제공하지 않으므로 결과를 객관적인 평가로 받아들이지 마세요.</p>
+                </article>
+                <article class="guide-card">
+                    <h3>사진은 어디에서 처리되나요?</h3>
+                    <p>사진은 브라우저에서 읽어 모델 입력으로 사용하며 이 사이트의 서버로 보내지 않습니다. 사진 처리와 무관하게 페이지에는 광고, 댓글, 모델·라이브러리 제공자의 외부 코드가 연결될 수 있습니다. 자세한 내용은 <a href="privacy.html">개인정보 처리 안내</a>를 확인하세요.</p>
+                </article>
+                <article class="guide-card">
+                    <h3>결과를 더 잘 확인하려면?</h3>
+                    <p>사진 속 인물이 한 명이고 얼굴이 가려지지 않은 밝고 선명한 이미지를 사용해 보세요. 필터, 그림자, 작은 얼굴, 측면 각도, 배경 요소는 결과에 영향을 줄 수 있습니다. 이는 결과를 보장하는 조건이 아니며, 사진을 바꿔 비교할 때도 점수가 달라질 수 있습니다.</p>
+                </article>
+            </div>
+        </section>
+
+        <section class="guide-section" id="faq">
+            <div class="section-top">
+                <div class="section-title"><span>자주 묻는 질문</span></div>
+            </div>
+            <div class="faq-list">
+                <details>
+                    <summary>업로드한 사진을 저장하거나 전송하나요?</summary>
+                    <p>이 사이트는 선택한 사진을 브라우저에서 모델에 입력하며 사이트 운영 서버로 업로드하지 않습니다. 사진은 브라우저 탭에서 테스트에 사용됩니다. 다만 광고·댓글·웹페이지 파일을 제공하는 외부 서비스는 별도의 접속 정보를 처리할 수 있으니 <a href="privacy.html">개인정보 처리 안내</a>를 확인하세요.</p>
+                </details>
+                <details>
+                    <summary>점수가 높으면 실제로 그 동물상이라는 뜻인가요?</summary>
+                    <p>아닙니다. 재미를 위한 두 가지 이미지 분류 모델의 출력값일 뿐이며, 사람의 외모·성격·정체성을 객관적으로 판단하거나 평가하지 않습니다.</p>
+                </details>
+                <details>
+                    <summary>모델이 로드되지 않거나 결과가 이상하면 어떻게 하나요?</summary>
+                    <p>인터넷 연결을 확인한 뒤 페이지를 새로고침하고 JPG 또는 PNG 등 선명한 이미지를 다시 선택해 보세요. 브라우저 확장 프로그램이나 네트워크 설정이 외부 모델 파일을 차단하면 테스트가 작동하지 않을 수 있습니다. 계속 문제가 있으면 아래 문의 양식으로 알려주세요.</p>
+                </details>
+                <details>
+                    <summary>댓글이나 제휴 문의에 작성한 내용도 사이트가 보관하나요?</summary>
+                    <p>댓글은 Disqus, 문의 양식은 Formspree를 통해 외부 서비스로 전송됩니다. 해당 서비스의 개인정보 처리 및 보관 방식은 각 제공자의 정책을 따르며, 자세한 내용은 <a href="privacy.html">개인정보 처리 안내</a>에서 확인할 수 있습니다.</p>
+                </details>
             </div>
         </section>
 
@@ -161,7 +213,7 @@
                 <span class="chip">강아지상 vs 고양이상</span>
             </div>
             <p class="guide-intro">
-                대표적인 두 가지 동물상! 어떤 특징과 매력의 차이가 있는지 한눈에 비교해보세요.
+                강아지상·고양이상은 얼굴 인상을 동물 이미지에 빗대어 말하는 대중문화 표현입니다. 아래 특징은 흔히 쓰이는 묘사를 정리한 것이며, 정답이나 객관적인 미의 기준은 아닙니다.
             </p>
 
             <div class="guide-grid">
@@ -174,11 +226,9 @@
                         </div>
                     </div>
                     <ul class="guide-list">
-                        <li><strong>눈매:</strong> 둥글고 크며, 눈꼬리가 살짝 내려가 순하고 다정한 인상</li>
-                        <li><strong>코 & 입:</strong> 둥글둥글한 코끝과 웃을 때 시원하게 올라가는 입꼬리</li>
-                        <li><strong>첫인상:</strong> 처음 보는 사람도 무장해제시키는 서글서글한 친화력</li>
-                        <li><strong>매력 포인트:</strong> 함께 있으면 마음이 편안해지고 활력을 주는 비타민 에너지</li>
-                        <li><strong>대표 연예인:</strong> 박보검, 송중기, 정해인, 박보영, 츄, 아이유, 백현 등</li>
+                        <li><strong>흔히 묘사되는 인상:</strong> 둥근 눈매, 부드러운 윤곽, 편안한 표정 등을 강아지상 이미지와 연결해 표현하기도 합니다.</li>
+                        <li><strong>사진에서 살펴볼 점:</strong> 표정, 촬영 각도, 조명에 따라 눈과 얼굴 윤곽이 다르게 보일 수 있습니다.</li>
+                        <li><strong>활용 방법:</strong> 하나의 특징만으로 판단하기보다 전체 인상이 어떻게 느껴지는지 가볍게 살펴보세요.</li>
                     </ul>
                 </article>
 
@@ -191,11 +241,9 @@
                         </div>
                     </div>
                     <ul class="guide-list">
-                        <li><strong>눈매:</strong> 눈꼬리가 살짝 올라가거나 가로로 길어 매혹적이고 세련된 눈매</li>
-                        <li><strong>코 & 턱선:</strong> 오뚝하고 날렵한 콧대와 샤프하고 갸름한 턱선</li>
-                        <li><strong>첫인상:</strong> 도도하고 차가워 보이지만 범접할 수 없는 세련된 아우라</li>
-                        <li><strong>매력 포인트:</strong> 알면 알수록 헤어나올 수 없는 츤데레 반전 매력</li>
-                        <li><strong>대표 연예인:</strong> 강동원, 이준기, 제니, 예지, 안소희, 한소희, 시우민 등</li>
+                        <li><strong>흔히 묘사되는 인상:</strong> 길게 보이는 눈매나 또렷한 윤곽 등을 고양이상 이미지와 연결해 표현하기도 합니다.</li>
+                        <li><strong>사진에서 살펴볼 점:</strong> 카메라 렌즈와 얼굴 방향은 비율과 윤곽의 인상을 바꿀 수 있습니다.</li>
+                        <li><strong>활용 방법:</strong> 이 표현은 성격이나 매력을 객관적으로 설명하거나 예측하는 기준이 아닙니다.</li>
                     </ul>
                 </article>
             </div>
@@ -210,7 +258,7 @@
                 </div>
             </div>
             <p class="comments-intro">
-                동물상 테스트 결과와 나의 매력 포인트를 자유롭게 공유하고 이야기 나눠보세요!
+                테스트 사용 경험과 개선 의견을 나눌 수 있는 댓글 공간입니다. 댓글은 외부 서비스인 Disqus에서 처리됩니다.
             </p>
             <div class="disqus-container">
                 <div id="disqus_thread"></div>
@@ -236,23 +284,22 @@
         <!-- Formspree Partnership Contact Section -->
         <section class="contact-section" id="contact">
             <div class="section-top">
-                <div class="section-title"><span>제휴 문의</span> (Partnership)</div>
+                <div class="section-title"><span>문의하기</span> & 제휴 (Contact)</div>
                 <div class="actions">
                     <span class="chip">협력 & 제휴</span>
                 </div>
             </div>
             <p class="contact-intro">
-                광고, 비즈니스 협력, 서비스 연계 등 다양한 제휴 제안을 환영합니다.<br>
-                남겨주신 내용은 담당자 검토 후 기재해주신 이메일 또는 연락처로 신속히 답변드리겠습니다.
+                서비스 오류, 개인정보 관련 요청, 광고·비즈니스 제안을 보내실 수 있습니다. 입력한 내용은 문의 접수를 위해 Formspree로 전송됩니다.
             </p>
 
             <form class="contact-form" id="partnershipForm" action="https://formspree.io/f/mbglleyp" method="POST">
-                <input type="hidden" name="_subject" value="[동물상 테스트] 새로운 제휴 문의가 접수되었습니다">
+                <input type="hidden" name="_subject" value="[AI 동물상 테스트] 사이트 문의가 접수되었습니다">
                 
                 <div class="form-grid">
                     <div class="form-group">
-                        <label for="contactName">회사명 / 담당자명 <span class="required">*</span></label>
-                        <input type="text" id="contactName" name="name" placeholder="예: (주)에이비씨 / 홍길동 팀장" required>
+                        <label for="contactName">이름 또는 닉네임 <span class="required">*</span></label>
+                        <input type="text" id="contactName" name="name" placeholder="이름 또는 닉네임" required>
                     </div>
 
                     <div class="form-group">
@@ -268,35 +315,36 @@
                     <div class="form-group">
                         <label for="contactType">제휴 유형 <span class="required">*</span></label>
                         <select id="contactType" name="type" required>
-                            <option value="" disabled selected>제휴 유형을 선택해주세요</option>
+                            <option value="" disabled selected>문의 유형을 선택해주세요</option>
                             <option value="광고/마케팅 제휴">광고 / 마케팅 제휴</option>
                             <option value="서비스/콘텐츠 연계">서비스 / 콘텐츠 제휴</option>
                             <option value="데이터/비즈니스 협력">데이터 / 비즈니스 협력</option>
-                            <option value="기타 제휴 문의">기타 제휴 문의</option>
+                            <option value="개인정보 관련 문의">개인정보 관련 문의</option>
+                            <option value="기타 문의">기타 문의</option>
                         </select>
                     </div>
                 </div>
 
                 <div class="form-group">
                     <label for="contactSubject">문의 제목 <span class="required">*</span></label>
-                    <input type="text" id="contactSubject" name="subject" placeholder="제휴 제안 건의 핵심 제목을 입력해주세요" required>
+                    <input type="text" id="contactSubject" name="subject" placeholder="문의 제목을 입력해주세요" required>
                 </div>
 
                 <div class="form-group">
                     <label for="contactMessage">제안 내용 <span class="required">*</span></label>
-                    <textarea id="contactMessage" name="message" rows="5" placeholder="회사/서비스 소개, 제안 배경 및 구체적인 협력 방안을 작성해주세요." required></textarea>
+                    <textarea id="contactMessage" name="message" rows="5" placeholder="문의 또는 제안 내용을 작성해주세요." required></textarea>
                 </div>
 
                 <div class="form-terms">
                     <label class="checkbox-label">
                         <input type="checkbox" name="privacy_agreement" required>
-                        <span>[필수] 문의 처리를 위한 담당자 정보(이름, 연락처, 이메일) 수집 및 이용에 동의합니다.</span>
+                        <span>[필수] 문의 처리를 위해 입력한 정보(이름, 연락처, 이메일, 문의 내용)를 수집·이용하는 데 동의합니다. 자세한 내용은 <a href="privacy.html">개인정보 처리 안내</a>를 확인하세요.</span>
                     </label>
                 </div>
 
                 <div class="form-submit-row">
                     <button type="submit" class="btn btn-primary submit-btn" id="contactSubmitBtn">
-                        <span class="btn-text">📨 제휴 문의 보내기</span>
+                        <span class="btn-text">📨 문의 보내기</span>
                         <span class="btn-spinner" style="display: none;">⏳ 전송 중...</span>
                     </button>
                     <div class="form-status" id="formStatus" role="status" aria-live="polite"></div>
@@ -315,7 +363,9 @@
             <span class="footer-divider">|</span>
             <a href="#comments" class="footer-contact-link">댓글 & 커뮤니티</a>
             <span class="footer-divider">|</span>
-            <a href="#contact" class="footer-contact-link">제휴 문의</a>
+            <a href="#contact" class="footer-contact-link">문의하기</a>
+            <span class="footer-divider">|</span>
+            <a href="privacy.html" class="footer-contact-link">개인정보 처리 안내</a>
         </div>
     </footer>
 

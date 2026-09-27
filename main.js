@@ -2,46 +2,50 @@
 // AI Animal Face Classifier (Teachable Machine)
 // ==========================================
 const MODEL_URL = "https://teachablemachine.withgoogle.com/models/3CAvzZ5dQ/";
+const MAX_IMAGE_SIZE = 10 * 1024 * 1024;
 
 let model = null;
-let isModelLoading = false;
+let modelLoadingPromise = null;
+let classificationRun = 0;
 
-// Preload Teachable Machine Model
+// Load the model on demand when the user starts a test
 async function loadAnimalModel() {
-    if (model || isModelLoading) return model;
-    isModelLoading = true;
-    try {
-        const modelURL = MODEL_URL + "model.json";
-        const metadataURL = MODEL_URL + "metadata.json";
-        model = await tmImage.load(modelURL, metadataURL);
-        console.log("Teachable Machine Animal Model loaded successfully!");
-        return model;
-    } catch (error) {
-        console.error("Failed to load Teachable Machine model:", error);
-        showToast("AI 모델을 불러오는 중 오류가 발생했습니다. 새로고침 후 다시 시도해주세요.");
-        return null;
-    } finally {
-        isModelLoading = false;
-    }
+    if (model) return model;
+    if (modelLoadingPromise) return modelLoadingPromise;
+
+    modelLoadingPromise = (async () => {
+        try {
+            const modelURL = MODEL_URL + "model.json";
+            const metadataURL = MODEL_URL + "metadata.json";
+            model = await tmImage.load(modelURL, metadataURL);
+            console.log("Teachable Machine Animal Model loaded successfully!");
+            return model;
+        } catch (error) {
+            console.error("Failed to load Teachable Machine model:", error);
+            return null;
+        } finally {
+            modelLoadingPromise = null;
+        }
+    })();
+
+    return modelLoadingPromise;
 }
 
 // Animal Classification Results Data
 const ANIMAL_INFO = {
     dog: {
-        badge: "🐶 사랑스러운 강아지상",
-        title: "다정하고 사랑스러운 멍뭉미!",
-        subtitle: "보는 순간 무장해제! 누구에게나 호감을 주는 최고의 친화력",
-        tags: ["#선한눈매", "#친근함", "#애교만점", "#비타민에너지", "#멍뭉미", "#무장해제미소", "#배려심"],
-        desc: "따뜻하고 다정한 눈빛과 서글서글한 인상으로 주변 사람들을 편안하고 행복하게 만들어주는 강아지상입니다. 밝고 긍정적인 에너지를 지니고 있어 친구나 동료들에게 늘 인기가 많으며, 애교 넘치고 배려심이 깊어 깊은 신뢰감을 줍니다. 웃을 때 반달눈이 되거나 입꼬리가 시원하게 올라가는 것이 가장 큰 매력 포인트입니다!",
-        celebs: "박보검, 송중기, 정해인, 박보영, 츄, 아이유, 백현, 강다니엘 등"
+        badge: "🐶 강아지 클래스",
+        title: "강아지 클래스 점수가 더 높아요",
+        subtitle: "선택한 이미지에 대해 모델이 강아지 클래스에 더 높은 점수를 부여했습니다.",
+        tags: ["이미지 분류 결과", "재미·참고용", "정확도 보증 아님"],
+        desc: "이 결과는 사진 속 얼굴의 특징이나 인물의 성격을 설명하지 않습니다. 강아지·고양이 두 분류로 구성된 이미지 모델의 출력값을 보여주는 오락용 결과입니다."
     },
     cat: {
-        badge: "🐱 도도하고 매력적인 고양이상",
-        title: "도도하고 치명적인 분위기 장인!",
-        subtitle: "시크한 첫인상 뒤에 숨겨진 치명적인 반전 매력의 소유자",
-        tags: ["#시크도도", "#치명적매력", "#분위기장인", "#세련된눈매", "#반전매력", "#츤데레", "#신비주의"],
-        desc: "매혹적이고 날렵한 눈매와 세련된 페이스 라인으로 신비로운 아우라를 자아내는 고양이상입니다. 첫인상은 쿨하고 도도해 보여 쉽게 다가가기 어려울 수 있지만, 한번 친해지면 숨겨왔던 반전 애교와 섬세함으로 상대방을 완전히 매료시키는 치명적인 매력을 가지고 있습니다. 조용히 바라보는 눈빛만으로도 시선을 사로잡는 분위기 미남/미녀입니다!",
-        celebs: "강동원, 이준기, 제니, 예지(ITZY), 안소희, 한소희, 시우민, 뷔(BTS) 등"
+        badge: "🐱 고양이 클래스",
+        title: "고양이 클래스 점수가 더 높아요",
+        subtitle: "선택한 이미지에 대해 모델이 고양이 클래스에 더 높은 점수를 부여했습니다.",
+        tags: ["이미지 분류 결과", "재미·참고용", "정확도 보증 아님"],
+        desc: "이 결과는 사진 속 얼굴의 특징이나 인물의 성격을 설명하지 않습니다. 강아지·고양이 두 분류로 구성된 이미지 모델의 출력값을 보여주는 오락용 결과입니다."
     }
 };
 
@@ -61,8 +65,6 @@ const resultTitle = document.getElementById("resultTitle");
 const resultSubtitle = document.getElementById("resultSubtitle");
 const resultTags = document.getElementById("resultTags");
 const resultDesc = document.getElementById("resultDesc");
-const resultCelebs = document.getElementById("resultCelebs");
-
 const dogBar = document.getElementById("dogBar");
 const dogPercent = document.getElementById("dogPercent");
 const catBar = document.getElementById("catBar");
@@ -129,18 +131,31 @@ if (dropZone && imageUpload && uploadBtn) {
 function handleSelectedFile(file) {
     if (!file.type.startsWith("image/")) {
         showToast("이미지 파일(JPG, PNG, WEBP 등)만 업로드할 수 있습니다.");
+        if (imageUpload) imageUpload.value = "";
+        return;
+    }
+    if (file.size > MAX_IMAGE_SIZE) {
+        showToast("이미지 파일은 10MB 이하만 사용할 수 있습니다.");
+        if (imageUpload) imageUpload.value = "";
         return;
     }
 
     const reader = new FileReader();
     reader.onload = function(e) {
-        startClassification(e.target.result);
+        if (typeof e.target.result === "string") {
+            startClassification(e.target.result);
+        } else {
+            showToast("이미지를 읽지 못했습니다. 다른 파일로 다시 시도해주세요.");
+        }
     };
+    reader.onerror = () => showToast("이미지를 읽지 못했습니다. 다른 파일로 다시 시도해주세요.");
     reader.readAsDataURL(file);
 }
 
 // Start AI Classification
 async function startClassification(imageSrc) {
+    const currentRun = ++classificationRun;
+
     // Hide dropzone, show result container
     dropZone.style.display = "none";
     resultCard.style.display = "block";
@@ -148,40 +163,33 @@ async function startClassification(imageSrc) {
     loadingStatus.style.display = "flex";
     if (scanningLine) scanningLine.style.display = "block";
 
-    previewImage.src = imageSrc;
-
-    // Loading status animation texts
-    if (loadingText) loadingText.textContent = "AI 모델 준비 중...";
-
-    // Ensure model is ready
-    let loadedModel = model;
-    if (!loadedModel) {
-        loadedModel = await loadAnimalModel();
-    }
-
-    if (!loadedModel) {
-        showToast("AI 모델을 불러오지 못했습니다. 다시 시도해주세요.");
-        resetTest();
-        return;
-    }
-
-    if (loadingText) loadingText.textContent = "얼굴 특징 랜드마크 분석 중...";
-
     previewImage.onload = async () => {
         try {
-            if (loadingText) loadingText.textContent = "강아지상 vs 고양이상 확률 계산 중...";
-            
-            // Artificial tiny delay for premium smooth UX
+            if (loadingText) loadingText.textContent = "AI 이미지 분류 모델 준비 중...";
+            const loadedModel = model || await loadAnimalModel();
+            if (currentRun !== classificationRun) return;
+            if (!loadedModel) {
+                showToast("AI 모델을 불러오지 못했습니다. 다시 시도해주세요.");
+                resetTest();
+                return;
+            }
+
+            if (loadingText) loadingText.textContent = "선택한 이미지를 분류하고 있습니다...";
             await new Promise(r => setTimeout(r, 600));
 
             const predictions = await loadedModel.predict(previewImage);
-            renderResults(predictions);
+            if (currentRun === classificationRun) renderResults(predictions);
         } catch (error) {
             console.error("Prediction error:", error);
             showToast("이미지 분석 중 오류가 발생했습니다. 다른 사진으로 시도해주세요.");
-            resetTest();
+            if (currentRun === classificationRun) resetTest();
         }
     };
+    previewImage.onerror = () => {
+        showToast("이미지를 표시하지 못했습니다. 다른 파일로 다시 시도해주세요.");
+        if (currentRun === classificationRun) resetTest();
+    };
+    previewImage.src = imageSrc;
 }
 
 // Render Classification Results
@@ -219,8 +227,6 @@ function renderResults(predictions) {
     if (resultTitle) resultTitle.textContent = data.title;
     if (resultSubtitle) resultSubtitle.textContent = data.subtitle;
     if (resultDesc) resultDesc.textContent = data.desc;
-    if (resultCelebs) resultCelebs.textContent = data.celebs;
-
     // Tags
     if (resultTags) {
         resultTags.innerHTML = "";
@@ -250,8 +256,13 @@ function renderResults(predictions) {
 
 // Reset / Retry
 function resetTest() {
+    classificationRun++;
     if (imageUpload) imageUpload.value = "";
-    if (previewImage) previewImage.src = "";
+    if (previewImage) {
+        previewImage.onload = null;
+        previewImage.onerror = null;
+        previewImage.src = "";
+    }
     if (dogBar) dogBar.style.width = "0%";
     if (catBar) catBar.style.width = "0%";
     if (resultCard) resultCard.style.display = "none";
@@ -268,7 +279,7 @@ if (shareBtn) {
     shareBtn.addEventListener("click", async () => {
         const shareData = {
             title: "AI 동물상 테스트 | 강아지상 vs 고양이상",
-            text: "인공지능이 분석한 내 얼굴의 동물상은? 지금 바로 무료로 테스트해보세요!",
+            text: "이미지 분류 모델은 내 사진에 어떤 점수를 냈을까요? 무료로 확인해보세요!",
             url: window.location.href
         };
 
@@ -397,7 +408,7 @@ function initPartnershipForm() {
                 form.reset();
                 if (formStatus) {
                     formStatus.className = "form-status show success";
-                    formStatus.textContent = "✅ 제휴 문의가 성공적으로 접수되었습니다. 담당자 검토 후 신속히 연락드리겠습니다.";
+                    formStatus.textContent = "✅ 문의가 접수되었습니다. 입력한 이메일로 답변드리겠습니다.";
                 }
             } else {
                 const data = await response.json().catch(() => null);
@@ -430,5 +441,4 @@ function initPartnershipForm() {
 document.addEventListener("DOMContentLoaded", () => {
     initTheme();
     initPartnershipForm();
-    loadAnimalModel(); // Start preloading Teachable Machine model
 });
